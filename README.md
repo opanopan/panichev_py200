@@ -1,1 +1,2 @@
-# panichev_py200
+Panichev Oleg
+Py200 task
