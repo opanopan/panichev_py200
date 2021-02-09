@@ -149,7 +149,7 @@ class Date:
     @staticmethod
     def date_from_days(days: int) -> []:
         """Принимает количество дней от рождества Христова, возвращает дату"""
-        sm = prevsm = months = years = 0
+        sm = prevsm = month = 0
         for i in range(3000):
             if sm > days:
                 year = i - 1
