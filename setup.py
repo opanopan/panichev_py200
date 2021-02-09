@@ -3,9 +3,28 @@ from typing import Optional, overload
 
 
 class TimeDelta:
+    """Класс для хранения времени без привязки к дате"""
+
+    YEAR = 365
+    MONTH = 30
+
     def __init__(self, days: Optional[int] = None, months: Optional[int] = None, years: Optional[int] = None):
         self.days, self.months, self.years = days, months, years
 
+    def days_counter(self):
+        sm = 0
+        if self.years is not None:
+            for i in range(self.years):
+                sm += self.YEAR
+
+        if self.months:
+            for i in range(1, self.months):
+                sm += self.MONTH
+
+        if self.days:
+            sm += self.days
+
+        return sm
 
 
 class Date:
@@ -24,8 +43,8 @@ class Date:
 
     def __init__(self, *args):
         if len(args) == 1 and isinstance(args[0], str):
-            self.dt = args[0].split(".")
-            self.day, self.month, self.year = int(self.dt[0]), int(self.dt[1]), int(self.dt[2])
+            self.__dt = args[0].split(".")
+            self.day, self.month, self.year = int(self.__dt[0]), int(self.__dt[1]), int(self.__dt[2])
 
         elif len(args) == 3:
             self.day = int(args[0])
@@ -42,7 +61,7 @@ class Date:
 
     def __repr__(self) -> str:
         """Возвращает дату в формате Date(day, month, year)"""
-        return (self.day, self.month, self.year)
+        return str(f"Date({self.day}, {self.month}, {self.year})")
 
     @staticmethod
     def is_leap_year(year: int) -> bool:
@@ -112,7 +131,7 @@ class Date:
 
     @staticmethod
     def days_count(day: int, month: int, year: int):
-        """Возвращает оличество дней от рождества Христова"""
+        """Возвращает количество дней от рождества Христова"""
         sm = 0
         for i in range(year):
             if Date.is_leap_year(i):
@@ -128,11 +147,12 @@ class Date:
         return sm
 
     @staticmethod
-    def date_from_days(days:int) -> []:
-        sm = 0
+    def date_from_days(days: int) -> []:
+        """Принимает количество дней от рождества Христова, возвращает дату"""
+        sm = prevsm = months = years = 0
         for i in range(3000):
             if sm > days:
-                year = i-1
+                year = i - 1
                 break
             elif sm == days:
                 year = i
@@ -149,9 +169,9 @@ class Date:
         days -= prevsm
 
         sm = 0
-        for i in range(1,13):
+        for i in range(1, 13):
             if sm > days:
-                month = i-1
+                month = i - 1
                 break
             elif sm == days:
                 month = i
@@ -161,33 +181,21 @@ class Date:
             month = i
 
         day = days - prevsm
-        return [day, month, year]
-
-
+        return day, month, year
 
     def __add__(self, other: TimeDelta) -> "Date":
         """Складывает self и некий timedeltа. Возвращает НОВЫЙ инстанс Date, self не меняет (+)"""
-        if TimeDelta.years:
 
-
-        print(other.days, other.months, other.years)
+        days = Date.days_count(self.day, self.month, self.year)
+        delta = other.days_counter()
+        day, month, year = Date.date_from_days(days + delta)
+        new_ob = Date(day, month, year)
+        return new_ob
 
     def __iadd__(self, other: TimeDelta) -> "Date":
         """Добавляет к self некий timedelta меняя сам self (+=)"""
 
-
-def main():
-    dt1 = Date("31.12.1981")
-    dt2 = Date(21, 12, 1982)
-    print(Date.days_count(12,8,1982))
-    print(Date.date_from_days(724134))
-
-    print(dt1.__sub__(dt2))
-    td1 = TimeDelta(33,121,1001)
-    dt2.__add__(td1)
-
-    # dt1.__sub__(dt2)
-
-
-if __name__ == "__main__":
-    main()
+        days = Date.days_count(self.day, self.month, self.year)
+        delta = other.days_counter()
+        self.day, self.month, self.year = Date.date_from_days(days + delta)
+        return self
