@@ -30,8 +30,8 @@ class TimeDelta:
 class Date:
     """Класс для работы с датами"""
 
-    YEAR = [31, 28, 31, 30, 31, 30, 30, 31, 30, 31, 30, 31]
-    L_YEAR = [31, 29, 31, 30, 31, 30, 30, 31, 30, 31, 30, 31]
+    YEAR = (31, 28, 31, 30, 31, 30, 30, 31, 30, 31, 30, 31)
+    L_YEAR = (31, 29, 31, 30, 31, 30, 30, 31, 30, 31, 30, 31)
 
     @overload
     def __init__(self, day: int, month: int, year: int):
@@ -43,10 +43,14 @@ class Date:
 
     def __init__(self, *args):
         if len(args) == 1 and isinstance(args[0], str):
-            self.__dt = args[0].split(".")
-            self.day, self.month, self.year = int(self.__dt[0]), int(self.__dt[1]), int(self.__dt[2])
+            dt = args[0].split(".")
+            self.day, self.month, self.year = int(dt[0]), int(dt[1]), int(dt[2])
 
         elif len(args) == 3:
+            for a in args:
+                if not isinstance(a, int):
+                    raise ValueError("Значения должны быть integer.")
+
             self.day = int(args[0])
             self.month = int(args[1])
             self.year = int(args[2])
@@ -56,25 +60,22 @@ class Date:
 
     def __str__(self) -> str:
         """Возвращает дату в формате dd.mm.yyyy"""
-        result = str(self.day).zfill(2) + "." + str(self.month).zfill(2) + "." + str(self.year)
+        result = f"{str(self.day).zfill(2)}.{str(self.month).zfill(2)}.{str(self.year).zfill(4)}"
         return result
 
     def __repr__(self) -> str:
         """Возвращает дату в формате Date(day, month, year)"""
-        return str(f"Date({self.day}, {self.month}, {self.year})")
+        return f"Date({self.day}, {self.month}, {self.year})"
 
     @staticmethod
     def is_leap_year(year: int) -> bool:
         """Проверяет, является ли год високосным"""
-        if year % 4 != 0 or (year % 100 == 0 and year % 400 != 0):
-            return False
-        else:
-            return True
+        return not (year % 4 != 0 or (year % 100 == 0 and year % 400 != 0))
 
     @classmethod
     def get_max_day(cls, month: int, year: int) -> int:
         """Возвращает максимальное количество дней в месяце для указанного года"""
-        if Date.is_leap_year(year):
+        if cls.is_leap_year(year):
             return cls.L_YEAR[month - 1]
         else:
             return cls.YEAR[month - 1]
@@ -82,12 +83,9 @@ class Date:
     @classmethod
     def is_valid_date(cls, day: int, month: int, year: int):
         """Проверяет, является ли дата корректной"""
-        if 0 < day <= cls.get_max_day(month, year) and \
-                0 < month <= 12 and \
-                0 < year <= 3000:
-            return True
-        else:
-            return False
+        return 0 < year <= 3000 and \
+               0 < month <= 12 and \
+               0 < day <= cls.get_max_day(month, year)
 
     @property
     def day(self):
@@ -199,3 +197,15 @@ class Date:
         delta = other.days_counter()
         self.day, self.month, self.year = Date.date_from_days(days + delta)
         return self
+
+
+def main():
+    a = Date(3, "3", 1982)
+    print(Date.is_valid_date(28, 2, 1982))
+    print(a.__str__())
+    print(a.__repr__())
+    print(Date.is_leap_year(202))
+
+
+if __name__ == "__main__":
+    main()
