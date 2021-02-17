@@ -58,9 +58,12 @@ class Date:
         else:
             raise ValueError("Expected one string or three integers.")
 
+        if not self.is_valid_date():
+            raise ValueError("Incorrect date: %s" % self.__str__())
+
     def __str__(self) -> str:
         """Возвращает дату в формате dd.mm.yyyy"""
-        result = f"{str(self.day).zfill(2)}.{str(self.month).zfill(2)}.{str(self.year).zfill(4)}"
+        result = f"{self.day:02d}.{self.month:02d}.{self.year:04d}"
         return result
 
     def __repr__(self) -> str:
@@ -80,12 +83,11 @@ class Date:
         else:
             return cls.YEAR[month - 1]
 
-    @classmethod
-    def is_valid_date(cls, day: int, month: int, year: int):
+    def is_valid_date(self):
         """Проверяет, является ли дата корректной"""
-        return 0 < year <= 3000 and \
-               0 < month <= 12 and \
-               0 < day <= cls.get_max_day(month, year)
+        return 0 < self.year <= 3000 and \
+               0 < self.month <= 12 and \
+               0 < self.day <= self.get_max_day(self.month, self.year)
 
     @property
     def day(self):
@@ -183,28 +185,32 @@ class Date:
 
     def __add__(self, other: TimeDelta) -> "Date":
         """Складывает self и некий timedeltа. Возвращает НОВЫЙ инстанс Date, self не меняет (+)"""
+        if not (hasattr(other, "years") and \
+                hasattr(other, "months") and \
+                hasattr(other, "days")):
+            raise ValueError("Class TimeDelta incorrect")
 
-        days = Date.days_count(self.day, self.month, self.year)
+        days = self.days_count(self.day, self.month, self.year)
         delta = other.days_counter()
-        day, month, year = Date.date_from_days(days + delta)
+        day, month, year = self.date_from_days(days + delta)
         new_ob = Date(day, month, year)
         return new_ob
 
     def __iadd__(self, other: TimeDelta) -> "Date":
         """Добавляет к self некий timedelta меняя сам self (+=)"""
 
-        days = Date.days_count(self.day, self.month, self.year)
+        days = self.days_count(self.day, self.month, self.year)
         delta = other.days_counter()
-        self.day, self.month, self.year = Date.date_from_days(days + delta)
+        self.day, self.month, self.year = self.date_from_days(days + delta)
         return self
 
 
 def main():
-    a = Date(3, "3", 1982)
-    print(Date.is_valid_date(28, 2, 1982))
-    print(a.__str__())
-    print(a.__repr__())
-    print(Date.is_leap_year(202))
+    # a = Date(31, 2, 1982)
+    c = Date("29.02.2020")
+    # d = Date("31.04.2021")
+    b = TimeDelta(3, 3)
+    print(a.__add__(b))
 
 
 if __name__ == "__main__":
