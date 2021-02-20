@@ -159,27 +159,26 @@ class Date:
         day = days - prevsm
         return day, month, year
 
-    def __add__(self, other: TimeDelta) -> "Date":
-        """Складывает self и некий timedeltа. Возвращает НОВЫЙ инстанс Date, self не меняет (+)"""
+    def _delta_addition(self, other):
         if not isinstance(other, TimeDelta):
             raise ValueError("Class TimeDelta incorrect")
+
         years_from_month = (other.months + self.month) // 12
         int_month = (other.months + self.month) % 12
         int_year = other.years + self.year + years_from_month
         days_sum = self.days_count(self.day, int_month, int_year) + other.days
 
-        new_day, new_mon, new_year = self.date_from_days(days_sum)
+        return self.date_from_days(days_sum)
+
+
+    def __add__(self, other: TimeDelta) -> "Date":
+        """Складывает self и некий timedeltа. Возвращает НОВЫЙ инстанс Date, self не меняет (+)"""
+        new_day, new_mon, new_year = self._delta_addition(other)
 
         return Date(new_day, new_mon, new_year)
 
     def __iadd__(self, other: TimeDelta) -> "Date":
         """Добавляет к self некий timedelta меняя сам self (+=)"""
-        if not isinstance(other, TimeDelta):
-            raise ValueError("Class TimeDelta incorrect")
-        years_from_month = (other.months + self.month) // 12
-        self.month = (other.months + self.month) % 12
-        self.year = other.years + self.year + years_from_month
+        self.day, self.month, self.year = self._delta_addition(other)
 
-        days_sum = self.days_count(self.day, self.month, self.year) + other.days
-
-        return self.date_from_days(days_sum)
+        return self
