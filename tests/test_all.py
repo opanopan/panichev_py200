@@ -1,8 +1,7 @@
 # Unit tests
 import pytest
 
-from main import Date
-from main import TimeDelta
+from date import Date, TimeDelta
 
 
 @pytest.mark.parametrize(("day", "month", "year"), [
