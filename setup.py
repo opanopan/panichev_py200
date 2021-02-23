@@ -16,6 +16,6 @@ setup(
         "tests": [
             "pytest = 6,2,2",
             "pytest-cov = 2.11.1",
-        ]
-    }
+        ],
+    },
 )
