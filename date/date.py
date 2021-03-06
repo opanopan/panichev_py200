@@ -73,39 +73,38 @@ class Date:
 
     @property
     def day(self):
-        return self._day
+        return self._day if hasattr(self, '_day') else 1
 
     @day.setter
     def day(self, value: int):
         """value от 1 до 31. Проверять значение и корректность даты"""
-        if value > 0 and value <= 31:
-            self._day = value
-        else:
-            raise ValueError("День должен быть в промежутке между 1 и 31.")
+        self._day = value
+        if not self.is_valid_date():
+            raise ValueError("Incorrect date: %s" % self.__str__())
 
     @property
     def month(self):
-        return self._month
+        return self._month if hasattr(self, '_month') else 1
 
     @month.setter
     def month(self, value: int):
         """value от 1 до 12. Проверять значение и корректность даты"""
-        if value > 0 and value <= 12:
-            self._month = value
-        else:
-            raise ValueError("Месяц должен быть в промежутке от 1 до 12.")
+        self._month = value
+
+        if not self.is_valid_date():
+            raise ValueError("Incorrect date: %s" % self.__str__())
 
     @property
     def year(self):
-        return self._year
+        return self._year if hasattr(self, '_year') else 0
 
     @year.setter
     def year(self, value: int):
         """value от 1 до ... . Проверять значение и корректность даты"""
-        if value >= 0 and value <= 3000:
-            self._year = value
-        else:
-            raise ValueError("Мы умеем работать с годом от 1 до 3000")
+        self._year = value
+
+        if not self.is_valid_date():
+            raise ValueError("Incorrect date: %s" % self.__str__())
 
     def __sub__(self, other: "Date") -> int:
         """Разница между датой self и other (-)"""
@@ -115,7 +114,7 @@ class Date:
         """Возвращает количество дней от рождества Христова"""
         sm = 0
         for i in range(year):
-            if Date.is_leap_year(i):
+            if self.is_leap_year(i):
                 sm += 366
             else:
                 sm += 365
@@ -169,7 +168,6 @@ class Date:
         days_sum = self.days_count(self.day, int_month, int_year) + other.days
 
         return self.date_from_days(days_sum)
-
 
     def __add__(self, other: TimeDelta) -> "Date":
         """Складывает self и некий timedeltа. Возвращает НОВЫЙ инстанс Date, self не меняет (+)"""
