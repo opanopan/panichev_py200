@@ -78,8 +78,10 @@ class Date:
     @day.setter
     def day(self, value: int):
         """value от 1 до 31. Проверять значение и корректность даты"""
+        curr_day = self._day if hasattr(self, '_day') else 1
         self._day = value
         if not self.is_valid_date():
+            self._day = curr_day
             raise ValueError("Incorrect date: %s" % self.__str__())
 
     @property
@@ -89,9 +91,11 @@ class Date:
     @month.setter
     def month(self, value: int):
         """value от 1 до 12. Проверять значение и корректность даты"""
+        curr_month = self._month if hasattr(self, '_month') else 1
         self._month = value
 
         if not self.is_valid_date():
+            self._month = curr_month
             raise ValueError("Incorrect date: %s" % self.__str__())
 
     @property
@@ -101,9 +105,11 @@ class Date:
     @year.setter
     def year(self, value: int):
         """value от 1 до ... . Проверять значение и корректность даты"""
+        curr_year = self._year if hasattr(self, '_year') else 0
         self._year = value
 
         if not self.is_valid_date():
+            self._year = curr_year
             raise ValueError("Incorrect date: %s" % self.__str__())
 
     def __sub__(self, other: "Date") -> int:
