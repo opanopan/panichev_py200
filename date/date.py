@@ -40,9 +40,6 @@ class Date:
         else:
             raise ValueError("Expected one string or three integers.")
 
-        if not self.is_valid_date():
-            raise ValueError("Incorrect date: %s" % self.__str__())
-
     def __str__(self) -> str:
         """Возвращает дату в формате dd.mm.yyyy"""
         result = f"{self.day:02d}.{self.month:02d}.{self.year:04d}"
@@ -65,11 +62,12 @@ class Date:
         else:
             return cls.YEAR[month - 1]
 
-    def is_valid_date(self):
+    @classmethod
+    def is_valid_date(cls, day, month, year):
         """Проверяет, является ли дата корректной"""
-        return 0 <= self.year <= 3000 and \
-               0 < self.month <= 12 and \
-               0 < self.day <= self.get_max_day(self.month, self.year)
+        return 0 <= year <= 3000 and \
+               0 < month <= 12 and \
+               0 < day <= cls.get_max_day(month, year)
 
     @property
     def day(self):
@@ -78,10 +76,11 @@ class Date:
     @day.setter
     def day(self, value: int):
         """value от 1 до 31. Проверять значение и корректность даты"""
-        curr_day = self._day if hasattr(self, '_day') else 1
-        self._day = value
-        if not self.is_valid_date():
-            self._day = curr_day
+        if self.is_valid_date(value, \
+                              self._month if hasattr(self, '_month') else 1, \
+                              self._year if hasattr(self, '_year') else 0):
+            self._day = value
+        else:
             raise ValueError("Incorrect date: %s" % self.__str__())
 
     @property
@@ -91,11 +90,11 @@ class Date:
     @month.setter
     def month(self, value: int):
         """value от 1 до 12. Проверять значение и корректность даты"""
-        curr_month = self._month if hasattr(self, '_month') else 1
-        self._month = value
-
-        if not self.is_valid_date():
-            self._month = curr_month
+        if self.is_valid_date(self._day if hasattr(self, '_day') else 1, \
+                              value, \
+                              self._year if hasattr(self, '_year') else 0):
+            self._day = value
+        else:
             raise ValueError("Incorrect date: %s" % self.__str__())
 
     @property
@@ -105,11 +104,11 @@ class Date:
     @year.setter
     def year(self, value: int):
         """value от 1 до ... . Проверять значение и корректность даты"""
-        curr_year = self._year if hasattr(self, '_year') else 0
-        self._year = value
-
-        if not self.is_valid_date():
-            self._year = curr_year
+        if self.is_valid_date(self._day if hasattr(self, '_day') else 1, \
+                              self._month if hasattr(self, '_month') else 1, \
+                              value):
+            self._day = value
+        else:
             raise ValueError("Incorrect date: %s" % self.__str__())
 
     def __sub__(self, other: "Date") -> int:
