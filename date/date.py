@@ -93,7 +93,7 @@ class Date:
         if self.is_valid_date(self._day if hasattr(self, '_day') else 1, \
                               value, \
                               self._year if hasattr(self, '_year') else 0):
-            self._day = value
+            self._month = value
         else:
             raise ValueError("Incorrect date: %s" % self.__str__())
 
@@ -107,7 +107,7 @@ class Date:
         if self.is_valid_date(self._day if hasattr(self, '_day') else 1, \
                               self._month if hasattr(self, '_month') else 1, \
                               value):
-            self._day = value
+            self._year = value
         else:
             raise ValueError("Incorrect date: %s" % self.__str__())
 
@@ -185,3 +185,7 @@ class Date:
         self.day, self.month, self.year = self._delta_addition(other)
 
         return self
+
+
+dt = Date(2, 2, 2)
+print(dt)
